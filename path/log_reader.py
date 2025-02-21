@@ -4,7 +4,7 @@ from collections import Counter
 def parse_log_line(line: str) -> dict:
     parts = line.split(" ", 3)
     if len(parts) < 4:
-        return{}
+        return None
     date, time, level, message = parts
     return {
         "date": date,
@@ -15,7 +15,7 @@ def parse_log_line(line: str) -> dict:
 
 def load_logs(file_path: str) -> list:
     with open(file_path, "r", encoding="utf-8") as file:
-        return [parse_log_line(line) for line in file if line.strip()]
+        return [log for line in file if (log := parse_log_line(line))]
     
 def filter_logs_by_level(logs: list, level: str) -> list:
     return [log for log in logs if log.get("level", "").lower() == level.lower()]
@@ -29,3 +29,16 @@ def display_log_counts(counts: dict):
         print(f"{level:<10}: {count:>5} записів")
     print("=" * 35)
 
+def main():
+    file_path = "path\logfile.log" 
+    logs = load_logs(file_path)
+    
+    if not logs:
+        print("Файл логів порожній або не існує.")
+        return
+    
+    counts = count_logs_by_level(logs)
+    display_log_counts(counts)
+
+if __name__=="__main__":
+    main()

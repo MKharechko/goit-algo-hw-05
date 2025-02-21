@@ -1,34 +1,20 @@
-def parse_input(user_input):
-    cmd, *args = user_input.split()
-    cmd = cmd.strip().lower()
-    return cmd, *args
-
 def input_erorr(func):
     def inner(*args, **kwargs):
         try:
             return func(*args, **kwargs)
         except ValueError:
             return "Give me name and phone please."
-    return inner 
-
-
-def change_erorr(func):
-    def inner_2(*args, **kwargs):
-        try:
-            return func(*args, **kwargs)
-        except ValueError:
-            return "Enter an existing name and write new phone."
-    return inner_2
-
-def show_error(func):
-    def inner_3(*args, **kwargs):
-        try:
-            return func(*args, **kwargs)
-        except IndexError:
-            return "Index not found, write again"
         except KeyError as e:
             return f"key {e} not found, try again"
-    return inner_3
+        except IndexError:
+            return "Index not found, write again"
+    return inner 
+
+@input_erorr
+def parse_input(user_input):
+    cmd, *args = user_input.split()
+    cmd = cmd.strip().lower()
+    return cmd, *args
 
 @input_erorr
 def add_contact(args, contacts):
@@ -36,8 +22,7 @@ def add_contact(args, contacts):
     contacts[name] = phone
     return "Contact added"
 
-
-@change_erorr
+@input_erorr
 def change_contact(args, contacts):
     name, new_number = args
     if name in contacts:
@@ -46,11 +31,12 @@ def change_contact(args, contacts):
     else:
         return f"Contact {name} not found"
 
-@show_error
+@input_erorr
 def show_phone(args, contacts):
     name = args[0]
     return contacts.get(name, f"{name} not found")
-@show_error
+
+@input_erorr
 def show_all(contacts):
         if contacts:
             return "\n".join(f"{name}: {phone}" for name, phone in contacts.items())
